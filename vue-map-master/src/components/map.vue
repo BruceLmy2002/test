@@ -8,8 +8,9 @@
         <!--        控件-->
 
 <!--        连线-->
-        <el-amap-polyline  :visible="visible.polyline" :path="polylinePath" ></el-amap-polyline>
-        <el-amap-layer-canvas v-if="canvas" :canvas="canvas" :bounds="bounds" :visible="visible.layer" @init="initLayer" ></el-amap-layer-canvas>
+          <el-amap-polyline v-for="p in polylinePath" :visible="visible.polyline" :path="p.path" :stroke-color="p.color"></el-amap-polyline>
+
+<!--        <el-amap-layer-canvas v-if="canvas" :canvas="canvas" :bounds="bounds" :visible="visible.layer" @init="initLayer" ></el-amap-layer-canvas>-->
 <!--        连线-->
 
 <!--        点标记-->
@@ -18,7 +19,6 @@
         <el-amap-loca @init="initLoca">
           <el-amap-loca-scatter :visible="visible.marker" :sourceData="points" :layer-style="layerStyleScatter" @click="clickMarker" ></el-amap-loca-scatter>
           <el-amap-loca-line :visible="visible.line" :sourceData="lines" :layer-style="layerStyle" @mousemove="mousemove"></el-amap-loca-line>
-
         </el-amap-loca>
 
       </el-amap>
@@ -55,7 +55,7 @@ export default {
         line:false,
         marker:true,
         polyline:false,
-        layer:true,
+        layer:false,
       },
       sourceUrl: 'https://a.amap.com/Loca/static/loca-v2/demos/mock_data/bj_bus.json',
       mapStyle: 'amap://styles/916e03b38cfc09e90d195b3a566df71a',

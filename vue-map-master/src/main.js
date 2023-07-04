@@ -26,7 +26,6 @@ VueAMap.initAMapApiLoader({
   // v: '1.4.4'
 });
 
-Vue.use(VueSocketio, config.restful.host || 'ws://127.0.0.1:3000', store);
 
 Vue.config.productionTip = false
 Vue.use(BaiduMap, {

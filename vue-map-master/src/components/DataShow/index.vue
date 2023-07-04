@@ -70,9 +70,12 @@
       <el-tab-pane label="查询结果" name="third">
         <el-table
           ref="multipleTable"
-          :data="tableDate"
+          :data="tableData"
           tooltip-effect="dark"
           style="width: 100%"
+          height="500"
+          :row-key="getRowKey"
+          :expand-row-keys="expandedRows"
           @selection-change="handleSelectionChange"
           @expand-change="expandChange">
           <el-table-column
@@ -83,25 +86,35 @@
             type="expand"
             width="55">
             <template slot-scope="props">
-              <div v-for="point in props.row.points">轨迹点：{{point}}</div>
+              <div v-for="point in props.row.features.geometry.coordinates">{{point}}</div>
             </template>
           </el-table-column>
           <el-table-column
-            prop="carType"
+            prop="carNumber"
             label="车牌号"
-            width="120">
+            width="140">
           </el-table-column>
           <el-table-column
-            prop="carNumber"
+            prop="count"
             label="次数"
             show-overflow-tooltip>
           </el-table-column>
           <el-table-column
-            prop="camId"
+            prop="cams"
             label="经过卡口"
             show-overflow-tooltip>
           </el-table-column>
         </el-table>
+<!--        <el-pagination-->
+<!--          @size-change="handleSizeChange"-->
+<!--          @current-change="handleCurrentChange"-->
+<!--          :current-page="currentPage"-->
+<!--          :page-sizes="[10, 20, 30, 40]"-->
+<!--          :page-size="pageSize"-->
+<!--          layout="total, sizes, prev, pager, next, jumper"-->
+<!--          :total="totalItems">-->
+<!--        </el-pagination>-->
+
         <el-button type="primary" style="margin-top: 10px" @click="showData">展示所选轨迹</el-button>
       </el-tab-pane>
       <el-tab-pane label="数据统计" name="fourth">
@@ -113,7 +126,9 @@
 
 <script>
 import {vehicleCamStats, listByCarNumberOrderInTimeRange} from "../../api/map";
-
+var colors = ['#FAE200', '#D27E37', '#C53634', '#C12B6E', '#A92E9A', '#67238A', '#211A50', '#18244E'].reverse();
+var allData = []
+var e = []
 export default {
   props:{
     camList:{}
@@ -126,14 +141,53 @@ export default {
         startTime:'',
         endTime:'',
       },
-      tableDate:[],
+      tableData:[],
+      // currentPage: 1, // 当前页码
+      // pageSize: 5, // 每页显示的条数
+      // totalItems: 0, // 总条数
+      expandedRows: [],
+      selected: [],
+      points: [],
     }
   },
   created() {
   },
   methods: {
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
+    getRowKey(row) {
+      return row.id; // 使用唯一标识作为行的 key
+    },
+    expandRow(row) {
+      e.push(row.id); // 将行的唯一标识添加到展开数组中
+    },
+    collapseRow(row) {
+      const index = e.indexOf(row.id);
+      if (index !== -1) {
+        e.splice(index, 1); // 从展开数组中移除行的唯一标识
+      }
+    },
+    // handleSizeChange(size) {
+    //   this.pageSize = size;
+    //   this.getData(); // 根据新的每页条数重新获取数据
+    // },
+    // handleCurrentChange(page) {
+    //   this.currentPage = page;
+    //   this.getData(); // 根据新的页码重新获取数据
+    // },
+    // getData() {
+    //   // 假设tableData为所有数据数组
+    //   // 这里根据实际情况使用适当的方式截取对应页码和条数的数据
+    //   const startIndex = (this.currentPage - 1) * this.pageSize;
+    //   const endIndex = startIndex + this.pageSize;
+    //   this.tableData = allData.slice(startIndex, endIndex);
+    // },
+    handleSelectionChange(rows) {
+      this.selected = rows.map(function(rows) {
+        return {
+          id: rows.id,
+          features: rows.features
+        };
+      })
+      console.log(this.selected)
     },
     handleFileChange1(event) {
       const file = event.target.files[0]; // 获取选择的文件
@@ -155,15 +209,64 @@ export default {
     },
     expandChange(row, expandedRows){
       if (expandedRows.includes(row)) {
-        // 行被展开
-        console.log('行被展开');
+        this.expandRow(row)
+        var a = []
+        a.push(row.carNumber)
+        let form = {
+          startTime: this.form.startTime,
+          endTime: this.form.endTime,
+          carNumbers: a,
+        }
+        console.log(allData)
+        if(allData[row.id].features.geometry.coordinates.length === 0 ){
+          listByCarNumberOrderInTimeRange(form).then((response) => {
+            console.log(response.msg)
+            row.features = response.msg.features[0]
+            allData[row.id].features = response.msg.features[0]
+            this.expandedRows = e
+          })
+        }
+
       } else {
         // 行被关闭
+        this.collapseRow(row);
         console.log('行被关闭');
       }
     },
     showData() {
-      this.$parent.$refs.mapView.visible.line = true;
+      const length = this.selected.length
+      console.log(this.selected)
+      for (var i=0; i<length; i++){
+        if (this.selected[i].features.geometry.coordinates.length === 0){
+          var a = []
+          a.push(allData[this.selected[i].id].carNumber)
+          let form = {
+            startTime: this.form.startTime,
+            endTime: this.form.endTime,
+            carNumbers: a,
+          }
+          var id = this.selected[i].id
+          listByCarNumberOrderInTimeRange(form).then((response) => {
+            allData[id].features = response.msg.features[0]
+          })
+        }
+        let line = {
+          path: allData[id].features.geometry.coordinates,
+          color: colors[id % colors.length]
+        }
+        for (var j=0; j<allData[id].features.geometry.coordinates.length; j++){
+          this.$parent.point.push({
+            lnglat : allData[id].features.geometry.coordinates[j],
+            camAddress: ' '
+          })
+        }
+
+        this.$parent.polylinePath.push(line)
+      }
+      console.log('=-----------------')
+      console.log(this.$parent.polylinePath)
+      console.log(this.$parent.point)
+      this.$parent.$refs.mapView.visible.polyline = true;
     },
 
     importFromMap() {
@@ -179,21 +282,27 @@ export default {
       }
     },
     onSubmit(){
-      this.tableDate = []
-      if(typeof this.form.carNumbers === "string"){
-        this.form.carNumbers.split(',')
-      }
+      this.tableData = []
       if(typeof this.form.camIds === "string"){
         this.form.camIds.split(',')
       }
+      console.log(this.form)
       vehicleCamStats(this.form).then((response) => {
+
         if(response.code === 200){
           this.$message({
             message: '查询成功',
             type: 'success'
           });
           console.log(response.msg)
-          this.$parent.lines = response.msg
+          allData = response.msg
+          for(var i=0; i<allData.length; i++){
+            allData[i].id = i
+            allData[i].features = {
+              geometry:{coordinates:[]}
+            }
+          }
+          this.tableData = allData
           // var i=0;
           // for (i=0; i<this.$parent.lines['features'].length; i++){
           //   const coordinates = this.$parent.lines['features'][i]['geometry']['coordinates']
@@ -206,7 +315,7 @@ export default {
           //   this.tableDate.push(data)
           // }
           // console.log(response)
-          // this.activeName = 'third'
+          this.activeName = 'third'
         }else {
           this.$message.error('查询失败');
         }
@@ -215,7 +324,7 @@ export default {
     },
     fill1(){
       this.form = {
-        carNumbers:["鲁A0000626000"],
+        camIds:["3701999862"],
         startTime:"2021-02-01 13:00:00",
         endTime:"2021-02-01 13:05:00"
       }

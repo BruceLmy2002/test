@@ -123,6 +123,7 @@ export default {
       getAllCamInfo().then((response) => {
         console.log(response.msg)
         this.points = response.msg
+        console.log(this.points)
 
       })
 

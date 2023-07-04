@@ -21,79 +21,81 @@ import {
 // 创建axios实例
 axios.defaults.withCredentials = true
 // 请求列表
-// const requestList = []
+const requestList = []
 // 取消列表
-// const CancelToken = axios.CancelToken
+const CancelToken = axios.CancelToken
 
 const service = axios.create({
     baseURL: process.env.BASE_API, // api的base_urlsources
     // timeout: 30000, // 请求超时时间
-    headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-    },
-    transformRequest: [function (data) {
-        let ret = ''
-        for (const it in data) {
-            if (data[it] || data[it] === 0) {
-                ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
-            } else {
-                ret += encodeURIComponent(it) + '=' + '&'
-            }
-        }
-        return ret
-    }]
+    // headers: {
+    //   'Content-Type': 'application/x-www-form-urlencoded'
+    //     // 'Content-Type': 'application/json; charset=UTF-8'
+    // },
+    //
+    // transformRequest: [function (data) {
+    //     let ret = ''
+    //     for (const it in data) {
+    //         if (data[it] || data[it] === 0) {
+    //             ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+    //         } else {
+    //             ret += encodeURIComponent(it) + '=' + '&'
+    //         }
+    //     }
+    //     return ret
+    // }]
 })
 // 添加请求拦截器
-service.interceptors.request.use(
-    config => {
-        // const request = JSON.stringify(config.url) + JSON.stringify(config.data)
-        // config.cancelToken = new CancelToken((cancel) => {
-        //     sources[request] = cancel
-        // })
-        // if (requestList.includes(request)) {
-        //     // sources[request]()
-        // } else {
-        //     requestList.push(request)
-        // }
-        if (config.head === 'json') {
-            config.headers['Content-Type'] = 'application/json;charset=UTF-8'
-            config.transformRequest = [(data) => {
-                return JSON.stringify(data)
-            }]
-        } else if (config.type === 'download') {
-            config.headers['Content-Type'] = 'application/json;charset=UTF-8'
-            config.responseType = 'arraybuffer'
-            config.transformRequest = [(data) => {
-                return JSON.stringify(data)
-            }]
-        } else if (config.head === 'multipart') {
-            config.headers['Content-Type'] = `multipart/form-data;charset=UTF-8`
-            config.transformRequest = [(data) => {
-                return (data)
-            }]
-        } else {
-            config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
-            config.transformRequest = [(data) => {
-                let ret = ''
-                for (const it in data) {
-                    if (data[it] || data[it] === 0) {
-                        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
-                    } else {
-                        ret += encodeURIComponent(it) + '=' + '&'
-                    }
-                }
-                return ret
-            }]
-        }
-        config.headers['X-Token'] = getToken()
-
-        return config
-    },
-    error => {
-        // 对请求错误做些什么
-        Promise.reject(error)
-    }
-)
+// service.interceptors.request.use(
+//     config => {
+//         // const request = JSON.stringify(config.url) + JSON.stringify(config.data)
+//         // config.cancelToken = new CancelToken((cancel) => {
+//         //     sources[request] = cancel
+//         // })
+//         // if (requestList.includes(request)) {
+//         //     // sources[request]()
+//         // } else {
+//         //     requestList.push(request)
+//         // }
+//         if (config.head === 'json') {
+//             config.headers['Content-Type'] = 'application/json;charset=UTF-8'
+//             config.transformRequest = [(data) => {
+//                 return JSON.stringify(data)
+//             }]
+//         } else if (config.type === 'download') {
+//             config.headers['Content-Type'] = 'application/json;charset=UTF-8'
+//             config.responseType = 'arraybuffer'
+//             config.transformRequest = [(data) => {
+//                 return JSON.stringify(data)
+//             }]
+//         } else if (config.head === 'multipart') {
+//             config.headers['Content-Type'] = `multipart/form-data;charset=UTF-8`
+//             config.transformRequest = [(data) => {
+//                 return (data)
+//             }]
+//         } else {
+//             config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+//             config.transformRequest = [(data) => {
+//                 let ret = ''
+//                 for (const it in data) {
+//                     if (data[it] || data[it] === 0) {
+//                         ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+//                     } else {
+//                         ret += encodeURIComponent(it) + '=' + '&'
+//                     }
+//                 }
+//                 return ret
+//             }]
+//         }
+//         config.headers['X-Token'] = getToken()
+//
+//         return config
+//     },
+//     error => {
+//         // 对请求错误做些什么
+//         Promise.reject(error)
+//     }
+// )
 
 // 添加响应拦截器
 service.interceptors.response.use(

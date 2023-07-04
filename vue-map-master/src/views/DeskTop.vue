@@ -1,7 +1,7 @@
 <template>
   <div class="main-cont" :style="mainContStyle">
     <div class="main-map" id="main-map" @click="hideMenu" :style="mainMapStyle">
-      <mapView ref="mapView"></mapView>
+      <mapView ref="mapView" :points="points" :point="point" :lines="lines" :polylinePath="polylinePath"></mapView>
     </div>
     <div class="desktop">
       <Row class="desktop-row">
@@ -26,7 +26,7 @@
         <Col span="2" class="start">
           <div type="text" @click="startMenu" class="start-btn">
             <Icon type="logo-windows" size="16" color="#ffb848" class="start-icon"></Icon>
-            <span class="start-text">系统菜单</span>
+            <span class="start-text">统计功能</span>
           </div>
         </Col>
         <Col span="2" class="start">
@@ -36,6 +36,12 @@
           </div>
         </Col>
       </Row>
+    </div>
+    <div class="data-monitor">
+      <info v-if="isInfo" ref="info" :camList="camList"></info>
+      <count v-if="isCount" ref="count" :camList="camList"></count>
+      <cars v-if="isCars" ref="count" :camList="camList"></cars>
+      <car v-if="isCar" ref="count" :camList="camList"></car>
     </div>
     <transition name="fade">
       <startMenu v-if="isShowMenu" @changeLayer="changeLayer"></startMenu>
@@ -48,41 +54,60 @@
 
 <script>
 import mapView from "@/components/map.vue";
-import startMenu from "@/components/startMenu.vue";
+import startMenu from "@/components/OpMenu.vue";
 import mapSetMenu from "@/components/mapSetMenu.vue";
+import info from "@/components/mapLayer/info1.vue"
+import count from "@/components/DataShow/index.vue"
+import car from "@/components/DataShow/car.vue"
+import cars from "@/components/DataShow/cars.vue"
 import { ihavesee } from "@/api/stream"
+import {getAllCamInfo} from "../api/map";
 
 export default {
   name: "hello",
   components: {
     mapView,
     startMenu,
-    mapSetMenu
+    mapSetMenu,
+    info,
+    count,
+    car,
+    cars
   },
   data() {
     return {
+      point:[],
+      points: {},
+      polylinePath:[],
+      lines:{},
+
+      cams:[],
       sysId: "",
+      // 底边栏是否显示
       isShowMenu: false,
       isShowSet:false,
+      // 相关查询面板是否显示
+      isInfo:false,
+      isCount:false,
+      isCar:false,
+      isCars:false,
       sysTime: {
         // date: new Date().toLocaleDateString(),
         // time: new Date().toLocaleTimeString()
       },
+      // 所选择的卡口组
+      camList:[],
+
       mainMapStyle: {},
       mainContStyle: {},
-      startMenuList: []
+      startMenuList: [],
+
     };
   },
-  sockets: {
-    connect: function () {
-      console.log("socket connected");
-    },
-    opend: function (data) {
-      console.log(11111, data);
-    }
-  },
+
   computed: {},
   mounted() {
+    this.init();
     this.setDesktopTime();
     this.setWindowSize();
     window.addEventListener(
@@ -92,18 +117,17 @@ export default {
       },
       false
     );
-
-    console.log(2222, this.$socket);
-    this.$socket.on("opend", function (data) {
-      console.log(111112, data);
-    });
-    this.doASee()
   },
   methods: {
-    //记录页面访问量，刷新次数
-    async doASee() {
-      let res = await ihavesee();
+    init(){
+      getAllCamInfo().then((response) => {
+        console.log(response.msg)
+        this.points = response.msg
+
+      })
+
     },
+
     changeLayer(id) {
       this.sysId = id
     },
@@ -150,6 +174,7 @@ export default {
       this.isShowMenu = false;
       this.isShowSet = !this.isShowSet;
     }
+
   }
 };
 </script>
@@ -157,7 +182,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 @import '~@/less/index.less';
-
+.data-monitor {
+  position: relative;
+  width: 500px;
+  height: 100%;
+}
 .desktop {
   width: 100%;
   height: 40px;

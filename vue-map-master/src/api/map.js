@@ -2,17 +2,36 @@
 
 import request from '@/utils/request'
 
-export function getInfoList() {
+// 获取全部卡口点信息
+export function getAllCamInfo() {
   return request({
-    url: '/map/getInfoList',
+    url: '/camTra/getAllCamInfo',
     method: 'post'
   })
 }
 
-
-export function getAllOrgBranchList() {
+// 轨迹查询
+export function searchCarTrajectory(data){
   return request({
-    url: '/map/getAllOrgBranchList',
-    method: 'post'
+    url: '/camTra/searchCarTrajectory',
+    method: 'post',
+    data: data,
+  })
+}
+
+// 车辆次数统计包含以下两个方法
+export function vehicleCamStats(data){
+  return request({
+    url: '/camTra/vehicleCamStats',
+    method: 'post',
+    data: data,
+  })
+}
+
+export function listByCarNumberOrderInTimeRange(data){
+  return request({
+    url: '/camTra/listByCarNumberOrderInTimeRange',
+    method: 'post',
+    data: data,
   })
 }

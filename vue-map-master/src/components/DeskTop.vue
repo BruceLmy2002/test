@@ -84,6 +84,7 @@ export default {
     });
   },
   methods: {
+
     //点击切换下面的小图标时候
     changePageShow: function (item) {
       let sysId = item.sysId;

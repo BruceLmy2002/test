@@ -1,15 +1,16 @@
-<!--车辆次数统计 某段时间内通过卡口的车辆及对应次数，所经过的卡口，该车辆轨迹-->
+<!--车辆出现统计：上传一批车，统计在某段时间范围，出现的次数。生成直方图饼图-->
 <template>
   <div class="info">
-    <div class="info-title">车辆次数统计
+    <div class="info-title">车辆出现统计
       <el-button type="danger" size="mini" icon="el-icon-circle-close" circle style="float:right" @click="close"></el-button>
     </div>
+
     <el-tabs v-model="activeName">
       <el-tab-pane label="查询条件" name="first">
         <div >
           <el-form ref="form" :model="form"  label-width="80px" >
-            <el-form-item label="卡口组" prop="camIds">
-              <el-input v-model="form.camIds" placeholder="输入多个用英文逗号分开,或者从本地文件中上传"></el-input>
+            <el-form-item label="车牌号" prop="carNumbers">
+              <el-input v-model="form.carNumbers" placeholder="输入多个用英文逗号分开,或者从本地文件中上传"></el-input>
             </el-form-item>
             <el-form-item >
               <input type="file" ref="fileInput" @change="handleFileChange1">
@@ -96,11 +97,7 @@
             label="次数"
             show-overflow-tooltip>
           </el-table-column>
-          <el-table-column
-            prop="camId"
-            label="经过卡口"
-            show-overflow-tooltip>
-          </el-table-column>
+
         </el-table>
         <el-button type="primary" style="margin-top: 10px" @click="showData">展示所选轨迹</el-button>
       </el-tab-pane>
@@ -112,6 +109,7 @@
 </template>
 
 <script>
+import { getInfoList } from "@/api/map";
 import {vehicleCamStats, listByCarNumberOrderInTimeRange} from "../../api/map";
 
 export default {
@@ -122,7 +120,7 @@ export default {
     return {
       activeName: 'first',
       form: {
-        camIds: '',
+        camNumbers: '',
         startTime:'',
         endTime:'',
       },
@@ -193,7 +191,7 @@ export default {
             type: 'success'
           });
           console.log(response.msg)
-          this.$parent.lines = response.msg
+          // this.$parent.lines = response.msg
           // var i=0;
           // for (i=0; i<this.$parent.lines['features'].length; i++){
           //   const coordinates = this.$parent.lines['features'][i]['geometry']['coordinates']
@@ -219,10 +217,18 @@ export default {
         startTime:"2021-02-01 13:00:00",
         endTime:"2021-02-01 13:05:00"
       }
-
       this.activeName = 'first'
     },
     fill2(){
+      this.form = {
+        carNumbers:["黑N0001284399","黑P0001093807"],
+        carTypes:["小型汽车号牌"],
+        startTime:"2021-02-01 00:00:00",
+        endTime:"2021-02-01 24:00:00",
+        camIds:["3701033233","3701022226"],
+        trajectoryCut:30
+      }
+
       this.activeName = 'first'
     },
     fill3(){
@@ -310,5 +316,7 @@ export default {
   }
 }
 </style>
+
+
 
 

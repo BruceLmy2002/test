@@ -2,40 +2,39 @@
   <div class="info">
     <h1>
     车辆类型：
-    <Select v-model="model1" style="width:100px">
-        <Option v-for="item in carType" :value="item.value1" :key="item.value">{{ item.label }}</Option>
-    </Select>
-
+    <el-select v-model="model1" style="width:100px">
+        <el-option v-for="item in carType" :value="item.value1" :key="item.value">{{ item.label }}</el-option>
+    </el-select>
     卡口组：
-    <Input v-model="bayonet" placeholder="请输入卡口组" style="width: 100px" />
+    <el-input v-model="bayonet" placeholder="请输入卡口组" style="width: 100px" />
   </h1>
-  <Button class="btn1" style="margin-top:10px; font-size: 20px;" @click="import1">批量导入</Button>
+  <el-button class="btn1" style="margin-top:10px; font-size: 20px;" @click="import1">批量导入</el-button>
   <h2>
     轨迹切分：
-    <Select v-model="model2" style="width:100px;margin-right: 5px;">
-        <Option v-for="item in trace" :value="item.value" :key="item.value">{{ item.label }}</Option>
-    </Select>
+    <el-select v-model="model2" style="width:100px;margin-right: 5px;">
+        <el-option v-for="item in trace" :value="item.value" :key="item.value">{{ item.label }}</el-option>
+    </el-select>
     车牌号：
-    <Input v-model="carNumber" placeholder="车牌号" style="width: 100px" />
+    <el-input v-model="carNumber" placeholder="车牌号" style="width: 100px" />
   </h2>
-    <Button class="btn4" style="margin-top: 10px;font-size: 20px"> 批量导入</Button>
+    <el-button class="btn4" style="margin-top: 10px;font-size: 20px"> 批量导入</el-button>
   <h3>
     起始时间：
-    <Select v-model="model3" style="width:90px;margin-right: 5px;">
-        <Option v-for="item in startTime" :value="item.value" :key="item.value">{{ item.label }}</Option>
-    </Select>
+    <el-select v-model="model3" style="width:90px;margin-right: 5px;">
+        <el-option v-for="item in startTime" :value="item.value" :key="item.value">{{ item.label }}</el-option>
+    </el-select>
 
 
 
     终止时间：
-    <Select v-model="model4" style="width:90px;margin-right: 5px;">
-        <Option v-for="item in endTime" :value="item.value" :key="item.value">{{ item.label }}</Option>
-    </Select>
+    <el-select v-model="model4" style="width:90px;margin-right: 5px;">
+        <el-option v-for="item in endTime" :value="item.value" :key="item.value">{{ item.label }}</el-option>
+    </el-select>
 
   </h3>
-  <Button class="btn2" style="margin-top:10px; font-size: 20px;">起止时间导入</Button>
+  <el-button class="btn2" style="margin-top:10px; font-size: 20px;">起止时间导入</el-button>
 <div>
-  <Button class="btn3" style="margin-top: 10px; font-size:20px;"> 查询</Button>
+  <el-button class="btn3" style="margin-top: 10px; font-size:20px;"> 查询</el-button>
 </div>
     <div>
       <Tabs value="name1">
@@ -44,8 +43,8 @@
             <Table height="180px" border ref="selection" :columns="columns1" :data="data1"></Table>
 
           </div>
-          <Button style="margin-left: 0;margin-top: 10px;margin-right: 30px;">展示所选轨迹</Button>
-          <Button style="margin-top: 10px;">导出所选轨迹</Button>
+          <el-button style="margin-left: 0;margin-top: 10px;margin-right: 30px;">展示所选轨迹</el-button>
+          <el-button style="margin-top: 10px;">导出所选轨迹</el-button>
         </TabPane>
         <TabPane label="直方图" name="name2">标签二的内容</TabPane>
         <TabPane label="饼图" name="name3">标签三的内容</TabPane>
@@ -175,8 +174,8 @@ export default {
  height: 100%;
   left: 30px;
   top: 20px;
-  background-color: #f1ecec;
-  color: #034082B1;
+  background-color: rgba(3, 64, 130, 0.698);
+  color: #ffffff;
   padding: 25px 35px;
   border-radius: 5px;
 

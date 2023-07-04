@@ -2,8 +2,8 @@
   <div id="startMenu">
     <div class="menu-top">
       <Icon type="md-map" class="user-icon"></Icon>
-<!--      <Icon type="md-person" class="user-icon"></Icon>-->
-      <span class="user-name">地图设置</span>
+      <!--      <Icon type="md-person" class="user-icon"></Icon>-->
+      <span class="user-name">功能菜单</span>
     </div>
     <div class="menu-cont">
       <Carousel v-model="value1" :trigger="'hover'" :arrow="'never'" class="menu-cont-page">
@@ -27,31 +27,23 @@
 </template>
 
 <script>
-import DataMonitor from "./DataMonitor/Index.vue";
-import test1 from "./sys1/Index.vue";
-import test2 from "./sys2/Index.vue";
-import sys3 from "@/views/sys3/Index.vue";
 
 export default {
   props: [],
-  components: {
-    DataMonitor,
-    test1,
-    test2,
-    sys3
-  },
   data() {
     return {
       button1:"关闭工具栏",
       button2:"显示监控卡口",
-      button3:"删除标记",
+      button3:"显示轨迹",
       button4:"3D地图",
       value1: 0,
       menuList: [
-        { id: 1, icon: "ios-analytics", title: "关闭工具栏", color: "#cb5a5e"},
-        { id: 2, icon: "md-apps", title: "显示监控卡口", color: "#30962d"},
-        { id: 3, icon: "md-aperture", title: "删除标记", color: "#ca8319"},
-        { id: 4, icon: "md-analytics", title: "3D地图", color: "#ed3f14"},
+        { id: 1, icon: "ios-analytics", title: "轨迹查询", color: "#cb5a5e"},
+        { id: 2, icon: "md-apps", title: "车辆次数统计", color: "#30962d"},
+        { id: 3, icon: "md-aperture", title: "车辆出现统计", color: "#ca8319"},
+        { id: 4, icon: "ios-basket-outline", title: "车辆卡口统计", color: "#ed3f14"},
+        { id: 5, icon: "md-analytics", title: "城市流量统计", color: "#151c2d"},
+        { id: 6, icon: "ios-briefcase-outline", title: "城市流量可视化", color: "#2b85e4"},
       ]
     };
   },
@@ -65,40 +57,29 @@ export default {
   },
   methods: {
     setMap(methodsNums) {
+      this.$parent.isShowMenu = false
+      this.$parent.isInfo = false
+      this.$parent.isCount = false
+      this.$parent.isCars = false
+      this.$parent.isCar = false
       this[methodsNums]()
     },
     1() {
-      if (this.menuList[0][0].title === "显示工具栏") {
-        this.$set(this.menuList[0][0], 'title', "关闭工具栏");
-        this.$parent.$refs.mapView.visible.control = true;
-      } else {
-        this.$parent.$refs.mapView.visible.control = false;
-        this.$set(this.menuList[0][0], 'title', "显示工具栏");
-      }
+      this.$parent.isInfo = true
     },
     2() {
-      if (this.menuList[0][1].title === "显示监控卡口") {
-        this.$parent.$refs.mapView.visible.marker = true;
-        this.$set(this.menuList[0][1], 'title', "隐藏监控卡口");
-      } else {
-        this.$parent.$refs.mapView.visible.marker = false;
-        this.$set(this.menuList[0][1], 'title', "显示监控卡口");
-      }
+
+      this.$parent.isCount = true
     },
     3() {
-      this.$parent.point=[]
-      this.$parent.camList=[]
-      this.$parent.polylinePath=[]
+
+      this.$parent.isCars = true
     },
     4() {
-      if (this.menuList[0][3].title === "3D地图") {
-        this.$parent.$refs.mapView.pitch = 55;
-        this.$set(this.menuList[0][3], 'title', "2D地图");
-      } else {
-        this.$parent.$refs.mapView.pitch = 0;
-        this.$set(this.menuList[0][3], 'title', "3D地图");
-      }
+      this.$parent.isCar = true
+
     },
+
     //格式化菜单数据,以6来均分
     menuCalculate: function () {
       var list = this.menuList;
